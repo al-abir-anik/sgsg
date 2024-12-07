@@ -23,7 +23,13 @@ async function run() {
   try {
     await client.connect();
 
-    const movieCollection = client.db("movieDB").collection("movies");
+    const movieCollection = client.db("movieDB").collection("movie");
+
+    app.get("/movie", async (req, res) => {
+      const cursor = movieCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     app.post("/movie", async (req, res) => {
       const newMovie = req.body;
