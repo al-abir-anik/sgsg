@@ -24,6 +24,7 @@ async function run() {
     await client.connect();
 
     const movieCollection = client.db("movieDB").collection("movie");
+    const favouriteCollection = client.db("movieDB").collection("favourites");
 
     app.get("/movie", async (req, res) => {
       const cursor = movieCollection.find();
@@ -39,9 +40,33 @@ async function run() {
       res.send(result);
     });
 
+    // Add a new Movie
     app.post("/movie", async (req, res) => {
       const newMovie = req.body;
       const result = await movieCollection.insertOne(newMovie);
+      res.send(result);
+    });
+
+    // Add movie to favourites
+    app.post("/favourites", async (req, res) => {
+      const { userEmail, movieId } = req.body;
+      const movie = await movieCollection.findOne({
+        _id: new ObjectId(movieId),
+      });
+
+      // const existingFavorite = await favouriteCollection.findOne({
+      //   userEmail,
+      //   _id: new ObjectId(movieId),
+      // });
+  
+      // if (existingFavorite) {
+      //   return res
+      //     .status(400)
+      //     .send({ message: "Movie is already in your favorites" });
+      // }
+
+      const favouriteMovie = { ...movie, userEmail };
+      const result = await favouriteCollection.insertOne(favouriteMovie);
       res.send(result);
     });
 
