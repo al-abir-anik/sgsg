@@ -31,7 +31,7 @@ async function run() {
       res.send(result);
     });
 
-    // For Update Movie
+    // To get specific Movie
     app.get("/movie/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -42,6 +42,26 @@ async function run() {
     app.post("/movie", async (req, res) => {
       const newMovie = req.body;
       const result = await movieCollection.insertOne(newMovie);
+      res.send(result);
+    });
+
+    // For Update Specific Movie
+    app.put("/movie/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedMovie = req.body;
+      const movie = {
+        $set: {
+          title: updatedMovie.title,
+          posterUrl: updatedMovie.posterUrl,
+          genre: updatedMovie.genre,
+          duration: updatedMovie.duration,
+          releaseYear: updatedMovie.releaseYear,
+          summary: updatedMovie.summary,
+        },
+      };
+      const result = await movieCollection.updateOne(filter, movie, options);
       res.send(result);
     });
 
